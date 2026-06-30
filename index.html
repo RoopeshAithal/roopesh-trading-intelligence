@@ -9,121 +9,282 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;background:#080810;color:#E8E8F0;min-height:100vh}
+    body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#080810;color:#E8E8F0;min-height:100vh}
     .app{max-width:480px;margin:0 auto;padding-bottom:70px}
     .header{background:linear-gradient(135deg,#0D0B1E,#1A0A3E);padding:20px 18px 14px;border-bottom:1px solid #1E1A3E}
-    .owner-badge{display:inline-flex;align-items:center;gap:5px;background:#1A0A3E;border:1px solid #4A2C8A;border-radius:20px;padding:3px 10px;font-size:10px;color:#A78BFA;margin-bottom:8px}
+    .badge{display:inline-flex;align-items:center;gap:5px;background:#1A0A3E;border:1px solid #4A2C8A;border-radius:20px;padding:3px 10px;font-size:10px;color:#A78BFA;margin-bottom:8px}
     .title{font-size:20px;font-weight:700;letter-spacing:-.5px}
     .subtitle{font-size:11px;color:#6B6B8A;margin-top:3px}
     .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1E1A3E}
     .stat{background:#0A0A0F;padding:10px 8px;text-align:center}
     .stat-val{font-size:17px;font-weight:700;color:#A78BFA}
-    .stat-label{font-size:9px;color:#555570;margin-top:1px}
+    .stat-lbl{font-size:9px;color:#555570;margin-top:1px}
     .tab-bar{display:flex;background:#0D0B1E;border-bottom:1px solid #1E1A3E;overflow-x:auto}
-    .tab{flex:0 0 auto;padding:9px 12px;background:none;border:none;border-bottom:2px solid transparent;color:#555570;font-size:11px;cursor:pointer;white-space:nowrap}
-    .tab.active{color:#A78BFA;border-bottom-color:#7C3AED;font-weight:600}
-    .section{padding:12px 16px}
+    .tab{flex:0 0 auto;padding:9px 10px;background:none;border:none;border-bottom:2px solid transparent;color:#555570;font-size:11px;cursor:pointer;white-space:nowrap}
+    .tab.on{color:#A78BFA;border-bottom-color:#7C3AED;font-weight:600}
+    .sec{padding:12px 16px}
     .card{background:#0D0B1E;border:1px solid #1E1A3E;border-radius:12px;margin-bottom:10px;overflow:hidden}
-    .btn{background:linear-gradient(135deg,#7C3AED,#4F46E5);border:none;border-radius:8px;color:#fff;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-bottom:12px}
-    .btn:disabled{opacity:0.6;cursor:not-allowed}
-    .pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
-    .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1E1A3E;margin:0 13px 10px;border-radius:6px;overflow:hidden}
+    .btn{background:linear-gradient(135deg,#7C3AED,#4F46E5);border:none;border-radius:8px;color:#fff;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-bottom:10px}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;border:1px solid transparent}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1E1A3E;margin:0 13px 10px;border-radius:6px;overflow:hidden}
     .cell{background:#0D0B1E;padding:7px 4px;text-align:center}
-    .cell-val{font-size:12px;font-weight:600}
-    .cell-label{font-size:9px;color:#555570}
-    .progress-wrap{padding:0 13px 10px}
-    .progress-bar{height:3px;background:#1E1A3E;border-radius:2px;overflow:hidden}
-    .progress-fill{height:100%;border-radius:2px;transition:width .4s}
-    .progress-labels{display:flex;justify-content:space-between;margin-top:2px;font-size:8px;color:#555570}
-    .trade-header{padding:11px 13px 8px;display:flex;justify-content:space-between;align-items:flex-start}
-    .trade-name{font-size:15px;font-weight:700;margin:0 4px}
-    .trade-sub{font-size:10px;color:#555570;margin-top:3px}
+    .cv{font-size:12px;font-weight:600}
+    .cl{font-size:9px;color:#555570}
+    .prog-wrap{padding:0 13px 10px}
+    .prog-bar{height:3px;background:#1E1A3E;border-radius:2px;overflow:hidden}
+    .prog-fill{height:100%;border-radius:2px;transition:width .4s}
+    .prog-lbls{display:flex;justify-content:space-between;margin-top:2px;font-size:8px;color:#555570}
+    .th{padding:11px 13px 8px;display:flex;justify-content:space-between;align-items:flex-start}
+    .tsub{font-size:10px;color:#555570;margin-top:3px}
     .exit-row{padding:0 13px 10px;display:flex;gap:8px}
-    .exit-box{flex:1;border-radius:6px;padding:6px 8px}
-    .exit-label{font-size:9px;margin-bottom:2px}
-    .exit-val{font-size:12px;font-weight:600}
-    .stop-box{background:#1A0A0A;border:1px solid #3D1515}
-    .target-box{background:#0A1A0A;border:1px solid #153D15}
-    .bottom-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#0D0B1E;border-top:1px solid #1E1A3E;padding:8px 16px;text-align:center;font-size:10px;color:#444460}
+    .eb{flex:1;border-radius:6px;padding:6px 8px}
+    .stop-b{background:#1A0A0A;border:1px solid #3D1515}
+    .tgt-b{background:#0A1A0A;border:1px solid #153D15}
+    .el{font-size:9px;margin-bottom:2px}
+    .ev{font-size:12px;font-weight:600}
+    .bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#0D0B1E;border-top:1px solid #1E1A3E;padding:8px 16px;text-align:center;font-size:10px;color:#444460}
     .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1A2E;border:1px solid #2A2A4E;border-radius:8px;padding:8px 18px;font-size:12px;color:#A78BFA;z-index:999;white-space:nowrap}
-    .empty{text-align:center;padding:30px;color:#555570}
-    .empty-icon{font-size:28px;margin-bottom:8px}
-    .journal-form{background:#0D0B1E;border:1px solid #4A2C8A;border-radius:12px;padding:14px;margin-bottom:12px}
-    .form-title{font-size:12px;font-weight:600;color:#A78BFA;margin-bottom:10px}
-    .form-label{font-size:11px;color:#6B6B8A;margin-bottom:4px;display:block}
-    .form-input{background:#080810;border:1px solid #2A2A4A;border-radius:8px;color:#E8E8F0;padding:9px 12px;font-size:13px;width:100%;margin-bottom:8px}
-    .form-input:focus{outline:none;border-color:#7C3AED}
-    .form-select{background:#080810;border:1px solid #2A2A4A;border-radius:8px;color:#E8E8F0;padding:9px 12px;font-size:13px;width:100%;margin-bottom:8px}
-    .btn-small{background:#1A0A3E;border:1px solid #4A2C8A;border-radius:6px;color:#A78BFA;padding:5px 10px;font-size:11px;cursor:pointer}
-    .btn-green{background:linear-gradient(135deg,#27AE60,#1A8A4A);border:none;border-radius:8px;color:#fff;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
-    .ip-box{background:#0A0520;border:1px solid #2D1B69;border-radius:10px;padding:12px;margin-bottom:12px}
-    .section-label{font-size:10px;color:#555570;margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase}
-    .algo-card{background:#0D0B1E;border:1px solid #1E1A3E;border-left:3px solid #7C3AED;border-radius:10px;padding:12px;margin-bottom:8px}
-    .verify-btn{background:transparent;border:1px solid #333;border-radius:5px;color:#555570;padding:3px 8px;font-size:10px;cursor:pointer}
-    .verify-btn.verified{background:#0A2010;border-color:#2ECC71;color:#2ECC71}
-    .history-card{background:#0D0B1E;border:1px solid #1E1A3E;border-radius:10px;margin-bottom:10px;padding:12px}
-    .history-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
-    .history-cell{background:#13132A;border-radius:6px;padding:6px 8px;text-align:center}
-    .grad-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #1E1A3E}
-    .grad-item:last-child{border-bottom:none}
+    .empty{text-align:center;padding:28px;color:#555570}
+    .fi{font-size:28px;margin-bottom:8px}
+    input,select{background:#080810;border:1px solid #2A2A4A;border-radius:8px;color:#E8E8F0;padding:9px 12px;font-size:13px;width:100%;margin-bottom:8px;outline:none}
+    input:focus,select:focus{border-color:#7C3AED}
+    label{font-size:11px;color:#6B6B8A;margin-bottom:4px;display:block}
+    .sm-btn{background:#1A0A3E;border:1px solid #4A2C8A;border-radius:6px;color:#A78BFA;padding:5px 10px;font-size:11px;cursor:pointer}
+    .green-btn{background:linear-gradient(135deg,#27AE60,#1A8A4A);border:none;border-radius:8px;color:#fff;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+    /* Pattern specific */
+    .verify-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600}
+    .verified{background:#0A2010;border:1px solid #2ECC71;color:#2ECC71}
+    .medium{background:#1A1200;border:1px solid #F39C12;color:#F39C12}
+    .low{background:#1A0A0A;border:1px solid #E74C3C;color:#E74C3C}
+    .evidence-box{background:#0A0A18;border:1px solid #1E1A3E;border-radius:8px;padding:10px;margin-top:8px}
+    .ev-title{font-size:10px;color:#6B6B8A;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+    .ev-step{display:flex;gap:8px;align-items:flex-start;padding:4px 0;border-bottom:1px solid #1E1A3E}
+    .ev-step:last-child{border-bottom:none}
+    .ev-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+    .ev-text{font-size:11px;color:#888;line-height:1.5}
+    .ev-date{font-size:10px;color:#555570}
+    .trigger-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+    .trigger-pill{font-size:10px;padding:3px 8px;border-radius:6px;background:#1A1A2E;border:1px solid #2A2A4E;color:#A78BFA}
+    .trigger-pill.hit{background:#0A2010;border-color:#2ECC71;color:#2ECC71}
+    .caution-pill{background:#1A0A0A;border-color:#E74C3C;color:#E74C3C}
+    .result-box{background:linear-gradient(135deg,#0A2010,#051005);border:1px solid #2ECC7155;border-radius:8px;padding:10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+    .result-pct{font-size:22px;font-weight:700;color:#2ECC71}
+    .result-detail{font-size:11px;color:#69F0AE}
+    .asset-tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto}
+    .asset-tab{padding:5px 12px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid #1E1A3E;background:transparent;color:#555570;white-space:nowrap}
+    .asset-tab.on{background:#1A0A3E;border-color:#4A2C8A;color:#A78BFA;font-weight:600}
+    .conf-bar-wrap{margin-top:6px}
+    .conf-bar-bg{height:6px;background:#1E1A3E;border-radius:3px;overflow:hidden;margin-top:4px}
+    .conf-bar-fill{height:100%;border-radius:3px;transition:width .5s}
     select option{background:#0D0B1E}
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useCallback } = React;
+const{useState,useEffect,useCallback}=React;
+const OWNER="Roopesh Aithal",VERSION="v2.0";
 
-const OWNER = "Roopesh Aithal";
-const VERSION = "v1.0";
-
-const TRADES = [
-  {id:"aapl",symbol:"AAPL",contract:"$295 Call",expiry:"Jul 2, 2026",expiryDate:"2026-07-02",direction:"call",entry:4.73,instrumentId:"00a93029-f53b-4ce3-b039-7a479be23a2b",type:"paper",emoji:"🍎",color:"#4A90D9",sector:"Tech"},
-  {id:"tsla",symbol:"TSLA",contract:"$390 Call",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"call",entry:25.00,instrumentId:null,type:"paper",emoji:"⚡",color:"#E03F3F",sector:"EV"},
-  {id:"spcx",symbol:"SPCX",contract:"$157.5 Put",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"put",entry:8.50,instrumentId:null,type:"paper",emoji:"🚀",color:"#9B59B6",sector:"Space"},
-  {id:"fro",symbol:"FRO",contract:"$43 Call",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"call",entry:2.13,instrumentId:"f5eb426f-ce9f-418e-a8ca-117ba55e8aa6",type:"paper",emoji:"🛢️",color:"#27AE60",sector:"Energy"},
-  {id:"sqqq",symbol:"SQQQ",contract:"$40 Call Jul17",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"call",entry:3.13,instrumentId:"65d56e64-9670-42ca-9a85-6de967d0f575",type:"paper",emoji:"📉",color:"#F39C12",sector:"Inverse ETF"},
-  {id:"gld",symbol:"GLD",contract:"$375 Put",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"put",entry:7.75,instrumentId:"b3b26a93-2030-4591-8fbc-19e1437fc862",type:"paper",emoji:"🥇",color:"#F1C40F",sector:"Commodities"},
-  {id:"smr",symbol:"SMR",contract:"$10 Call",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"call",entry:1.55,instrumentId:"fdee6570-7e4d-44ba-9efd-31f9109a8757",type:"paper",emoji:"⚛️",color:"#1ABC9C",sector:"Nuclear"},
+const TRADES=[
+  {id:"tsla",symbol:"TSLA",contract:"$390 Call",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"call",entry:25.00,instrumentId:null,type:"paper",emoji:"⚡",color:"#E03F3F",sector:"EV",status:"closed",closePnl:48},
+  {id:"spcx",symbol:"SPCX",contract:"$157.5 Put",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"put",entry:8.50,instrumentId:null,type:"paper",emoji:"🚀",color:"#9B59B6",sector:"Space",status:"open"},
+  {id:"smr",symbol:"SMR",contract:"$10 Call",expiry:"Jul 17, 2026",expiryDate:"2026-07-17",direction:"call",entry:1.55,instrumentId:"fdee6570-7e4d-44ba-9efd-31f9109a8757",type:"paper",emoji:"⚛️",color:"#1ABC9C",sector:"Nuclear",status:"open"},
+  {id:"gld_closed",symbol:"GLD",contract:"$375 Put",expiry:"Closed",expiryDate:"2026-06-25",direction:"put",entry:7.75,instrumentId:null,type:"paper",emoji:"🥇",color:"#F1C40F",sector:"Commodities",status:"closed",closePnl:52.3},
+  {id:"sqqq",symbol:"SQQQ",contract:"$40 Call",expiry:"Closed",expiryDate:"2026-06-29",direction:"call",entry:3.13,instrumentId:null,type:"paper",emoji:"📉",color:"#F39C12",sector:"Inverse ETF",status:"closed",closePnl:-80.8},
+  {id:"aapl",symbol:"AAPL",contract:"$295 Call",expiry:"Closed",expiryDate:"2026-06-25",direction:"call",entry:4.73,instrumentId:null,type:"paper",emoji:"🍎",color:"#4A90D9",sector:"Tech",status:"closed",closePnl:-92.4},
+  {id:"fro",symbol:"FRO",contract:"$43 Call",expiry:"Closed",expiryDate:"2026-06-25",direction:"call",entry:2.13,instrumentId:null,type:"paper",emoji:"🛢️",color:"#27AE60",sector:"Energy",status:"closed",closePnl:-81.2},
 ];
 
-const STOP=-0.35, TARGET=0.40;
-const PATTERN_TYPES={NEWS_DRIVEN:"📰 News-Driven",DIVIDEND:"💰 Dividend",POST_IPO:"🚀 Post-IPO Fade",EARNINGS:"📊 Earnings",MACRO:"🌍 Macro",TECHNICAL:"📈 Technical",SECTOR:"🏭 Sector",WRONG_DIRECTION:"🔄 Direction Flip"};
-const TABS=["trades","history","patterns","journal","algorithms"];
-const TAB_LABELS={trades:"📊 Trades",history:"📅 History",patterns:"🧠 Patterns",journal:"📓 Journal",algorithms:"⚗️ Algorithms"};
+const PATTERNS={
+  options:[
+    {id:"P001",name:"GLD Geopolitical Fear Put",confidence:"HIGH",wins:1,losses:0,
+     triggers:["Middle East tension EASING","Fed rate hike risk RISING","GLD near recent highs","DXY trending UP"],
+     action:"Buy GLD Put · ATM strike · 3-4 weeks expiry · GTC limit",
+     evidence:[
+       {date:"Jun 24",text:"Iran deal progressing + PCE 4.1% annual (hot) — both triggers fire simultaneously",dot:"#A78BFA"},
+       {date:"Jun 25 AM",text:"Paper entry: GLD $375 Put @ $7.75 with GLD at $377",dot:"#3498DB"},
+       {date:"Jun 25 PM",text:"GLD fell to $365 as geopolitical fear faded + rate hike fears rose",dot:"#F39C12"},
+       {date:"Jun 25 close",text:"Premium rose $7.75 → $11.80 (+52.3%) — TARGET HIT, closed ✅",dot:"#2ECC71"},
+     ],
+     result:{pct:"+52.3%",detail:"1 trade · 1 win · Jun 25 2026"},
+     why:"The causal chain was exact and repeatable: Iran peace deal removed gold's safe-haven bid while hot PCE data reinforced Fed hawkishness, strengthening the dollar. Both forces push gold down simultaneously — and both were confirmed before entry.",
+     nextSetup:"Jobs report Thu Jul 2 — if strong (>130K) → Fed hike risk rises → P001 triggers again → GLD $360 Put Jul 17 @ $4.40",
+    },
+    {id:"P002",name:"Oil Sector Macro Override",confidence:"HIGH",wins:0,losses:1,
+     triggers:["WTI/Brent crude DOWN >5% over 2 weeks","Geopolitical supply fear EASING"],
+     action:"AVOID calls on oil stocks · Buy PUTS instead · Always check crude first",
+     evidence:[
+       {date:"Jun 24",text:"FRO had record Q1 profits + $1.55 dividend — looked bullish",dot:"#A78BFA"},
+       {date:"Jun 24",text:"Entered FRO $43 Call @ $2.13 — bullish thesis on fundamentals",dot:"#3498DB"},
+       {date:"Jun 25",text:"Iran deal signed — Strait of Hormuz opened — oil tanker rates collapse",dot:"#E74C3C"},
+       {date:"Jun 25",text:"FRO $43 Call → $0.40 (-81.2%) — STOP LOSS. Macro crushed fundamentals.",dot:"#E74C3C"},
+     ],
+     result:{pct:"-81.2%",detail:"Learned from loss · Rule now: check WTI FIRST"},
+     why:"Oil macro ALWAYS overrides company fundamentals short-term. The Iran deal made tanker rates irrelevant regardless of how good FRO's earnings were. This pattern now prevents re-entry into this trap.",
+    },
+    {id:"P003",name:"Short-Dated OTM Call Trap",confidence:"HIGH",wins:0,losses:1,
+     triggers:["Option >2% OTM","Less than 10 days to expiry","BOTH conditions = AVOID"],
+     action:"NEVER enter · If already in: EXIT IMMEDIATELY · Only ATM + 14+ days",
+     evidence:[
+       {date:"Jun 24",text:"AAPL $295 Call entered at $4.73 with AAPL at $291 (1.4% OTM, 8 days left)",dot:"#A78BFA"},
+       {date:"Jun 25",text:"Theta destroyed $4.37 of premium overnight — stock barely moved",dot:"#E74C3C"},
+       {date:"Jun 25",text:"Premium → $0.36 (-92.4%). Stock needed +$4 in 7 days just to break even.",dot:"#E74C3C"},
+     ],
+     result:{pct:"-92.4%",detail:"Theta is lethal · Universal rule for ALL options"},
+     why:"Time decay (theta) on short-dated OTM options is exponential, not linear. With 7 days left, theta was destroying ~$0.60/day while the stock needed an unrealistic $4 move. The math was impossible from day one.",
+    },
+    {id:"P004",name:"Tech Relief Rally Call",confidence:"MEDIUM",wins:1,losses:0,
+     triggers:["Tech down 5%+ over prior week","Major AI/chip earnings BEAT >10%","OR strong relief rally day"],
+     action:"Buy TQQQ/TSLA Call · ATM · 2-3 weeks expiry · Exit same day or within week",
+     evidence:[
+       {date:"Jun 24",text:"Nasdaq fell 2.2% — chip selloff on Korea concerns",dot:"#A78BFA"},
+       {date:"Jun 25",text:"Micron beat $41.46B vs $35.84B (+16%) — AI demand blowout",dot:"#3498DB"},
+       {date:"Jun 29",text:"TSLA +8.45%, Alphabet +4.96%, Nasdaq +2.07% — full relief rally",dot:"#2ECC71"},
+       {date:"Jun 30",text:"TSLA $390 Call estimated ~+48% — TARGET HIT ✅",dot:"#2ECC71"},
+     ],
+     result:{pct:"~+48%",detail:"1 observation · MEDIUM confidence · needs more data"},
+     why:"When tech sells off on fear and then a major catalyst (earnings beat) confirms AI spending is intact, the snapback is fast and reliable. TSLA and Mag7 move in concert during these events.",
+    },
+    {id:"P005",name:"SQQQ Entry on Market Strength",confidence:"LOW",wins:1,losses:1,
+     triggers:["Market up 1.5-2.5%","PLUS: Confirmed dated catalyst (CPI/PCE/FOMC) within expiry","WITHOUT catalyst = DO NOT TRADE"],
+     action:"Buy SQQQ Call · ATM · 2-3 weeks · GTC · ONLY with confirmed catalyst",
+     evidence:[
+       {date:"Jun 23",text:"Simulated: SQQQ $40C @ $0.87 (GFD error, never filled) — would have been +108%",dot:"#F39C12"},
+       {date:"Jun 25",text:"Re-entered SQQQ $40C Jul17 @ $3.13 — market felt overextended",dot:"#A78BFA"},
+       {date:"Jun 29",text:"Market kept rallying (melt-up). SQQQ → $0.60 (-80.8%) — STOP LOSS hit",dot:"#E74C3C"},
+     ],
+     result:{pct:"-80.8%",detail:"DOWNGRADED · Sentiment alone ≠ valid entry · Need confirmed catalyst"},
+     why:"Markets can stay irrational far longer than a short-dated option survives. 'Felt overextended' is NOT a trading signal. This pattern now requires a specific dated macro event (CPI print, FOMC meeting) within the option's window before entry.",
+    },
+    {id:"P006",name:"GTC vs GFD Order Rule",confidence:"HIGH",wins:0,losses:0,
+     triggers:["Any options limit order on any platform"],
+     action:"ALWAYS GTC · NEVER GFD · GFD expires at close if unfilled",
+     evidence:[
+       {date:"Jun 23",text:"SQQQ $40C ordered at $0.87 GFD — ask was $0.92, never filled",dot:"#A78BFA"},
+       {date:"Jun 24",text:"Order expired at market close — missed potential +108% profit",dot:"#E74C3C"},
+       {date:"Jun 24",text:"Cost: $94 in missed paper profit · Rule now: GTC always",dot:"#F39C12"},
+     ],
+     result:{pct:"$94 missed",detail:"Universal rule · No exceptions · Ever"},
+     why:"A GFD limit order dies at 4 PM if not filled. A GTC order stays alive until filled or cancelled. For options with tight bid-ask spreads, the difference can be a fill vs a miss — as proven here.",
+    },
+  ],
+  stocks:[
+    {id:"S001",name:"Post-IPO Gravity Fall",confidence:"HIGH",wins:0,losses:0,
+     triggers:["Stock >20% above IPO price in first 2 weeks","No earnings history","High retail FOMO"],
+     action:"Buy Put on stock · ATM · 4-6 weeks expiry · Watch lock-up expiry",
+     evidence:[{date:"Jun 12",text:"SPCX IPO at $135, hit $225 (+67%) in week 1",dot:"#A78BFA"},{date:"Jun 27",text:"SPCX at $152 — down 32% from ATH. Pattern developing.",dot:"#F39C12"}],
+     result:{pct:"Developing",detail:"SPCX confirming · Lock-up expiry Sep-Dec 2026"},
+     why:"Post-IPO hype always fades as insiders prepare to sell and retail buyers realize there's no earnings anchor for valuation.",
+    },
+    {id:"S002",name:"Nuclear AI Accumulate on Dip",confidence:"MEDIUM",wins:0,losses:0,
+     triggers:["Nuclear stock down 50%+ from peak","AI data center power demand intact","NRC approvals progressing"],
+     action:"Accumulate stock in tranches · NO short-dated calls · Use LEAPS (6+ months) only",
+     evidence:[{date:"Jun 2026",text:"SMR at $10.09 — down 58.9% from $24.53 avg. Thesis intact.",dot:"#A78BFA"}],
+     result:{pct:"-58.9% on stock",detail:"Long-term thesis · 12-18 month horizon"},
+     why:"Nuclear energy for AI data centers is a 10-year theme. Short-term price action is driven by speculative retail — the thesis requires patience.",
+    },
+    {id:"S003",name:"EV China Macro Override",confidence:"HIGH",wins:0,losses:3,
+     triggers:["US-China tariff escalation","CNY weakening","China GDP miss"],
+     action:"AVOID calls on Chinese EVs · Check US-China relations FIRST",
+     evidence:[{date:"Jun 2026",text:"NIO -29.7%, XPEV -43.9%, BYDDY -35.9% — all macro-driven",dot:"#E74C3C"}],
+     result:{pct:"3 losses",detail:"China macro > EV growth story short-term"},
+     why:"US-China trade tensions override any company-level growth story for Chinese-listed stocks. Always check geopolitical context first.",
+    },
+    {id:"S004",name:"eVTOL Pre-Revenue Caution",confidence:"HIGH",wins:0,losses:2,
+     triggers:["FAA certification delayed","Cash runway <18 months","Secondary offering"],
+     action:"Max 2% portfolio per position · No short calls · Wait for FAA Type Certificate",
+     evidence:[{date:"Jun 2026",text:"ACHR -44.8%, JOBY -43.8% — certification timeline uncertainty",dot:"#E74C3C"}],
+     result:{pct:"2 losses",detail:"Pre-revenue aerospace = speculative"},
+     why:"Without FAA certification, these companies have no revenue path. Stock price is 100% sentiment-driven — extremely volatile.",
+    },
+    {id:"S005",name:"Defense Geopolitical Hedge",confidence:"HIGH",wins:0,losses:0,
+     triggers:["New geopolitical conflict","NATO budget increase","Defense bill signed"],
+     action:"Accumulate RTX on dips · Buy calls on pullbacks · Exit when P/E >25x",
+     evidence:[{date:"Jun 2026",text:"RTX -5.6% on Iran peace deal — typical defense dip on de-escalation",dot:"#A78BFA"}],
+     result:{pct:"Minor loss",detail:"Thesis intact · Iran deal temporary pressure"},
+     why:"Defense stocks are the inverse of GLD in geopolitical terms. They rise when tension rises, dip when it eases. The Iran deal was a short-term headwind.",
+    },
+    {id:"S006",name:"Fintech Network Effect",confidence:"HIGH",wins:1,losses:0,
+     triggers:["MAU growing 20%+ YoY","Options/crypto volume spike","Stock down 20%+ from high"],
+     action:"Buy HOOD on dips · Buy calls ATM 4-6 weeks · Exit when volume normalizes",
+     evidence:[{date:"Jun 2026",text:"HOOD bought at $82.25, now $98.70 (+20%) — best portfolio performer",dot:"#2ECC71"}],
+     result:{pct:"+20%",detail:"Network effect + options boom = bullish"},
+     why:"Robinhood profits directly from trading volume — when options and crypto volume spikes (like now), HOOD's revenue grows without extra cost.",
+    },
+  ],
+  crypto:[
+    {id:"C001",name:"BTC Geopolitical Fear Selloff",confidence:"MEDIUM",wins:0,losses:0,
+     triggers:["BTC down 10-15% in 48hrs on macro news","Fear & Greed <25","Nasdaq also down 2%+","No crypto-specific negative news"],
+     action:"Accumulate BTC spot during fear dips · DCA over 3-5 days · NOT leveraged",
+     evidence:[{date:"Jun 24",text:"BTC fell to $62,729 (-4.47% weekly) — Nasdaq selloff, DXY at 1-year high",dot:"#A78BFA"}],
+     result:{pct:"Tracking",detail:"BTC tracked Nasdaq precisely — pattern clear"},
+     why:"BTC now trades as a risk asset (71% correlation to Nasdaq). Macro-driven selloffs that aren't crypto-specific are historically good buying opportunities.",
+    },
+    {id:"C002",name:"ETH vs BTC Stress Beta",confidence:"HIGH",wins:0,losses:0,
+     triggers:["ETH/BTC ratio falling = risk-off","ETH/BTC ratio rising = risk-on"],
+     action:"When ETH/BTC turns up: rotate some BTC to ETH · Use ratio as signal not price",
+     evidence:[{date:"Jun 2026",text:"ETH down 2-3x more than BTC in every selloff — 2x beta confirmed",dot:"#A78BFA"}],
+     result:{pct:"Consistent",detail:"Observed across multiple events · HIGH confidence"},
+     why:"ETH has higher beta to BTC in both directions. During fear, institutional money goes to BTC (more liquid/safe). During greed, ETH outperforms as DeFi/NFT/Layer2 activity picks up.",
+    },
+    {id:"C003",name:"SOL Ecosystem Momentum",confidence:"MEDIUM",wins:0,losses:0,
+     triggers:["SOL Chain GDP growing QoQ","New institutional DeFi protocol on Solana","BTC dominance declining"],
+     action:"Accumulate SOL spot on macro dips · Target 30-90 day hold",
+     evidence:[{date:"Q1 2026",text:"Solana Chain GDP $342.2M — record. Tokenized stocks platform launching.",dot:"#A78BFA"}],
+     result:{pct:"Tracking",detail:"Strong fundamentals · SOL at $71.92 +5% today"},
+     why:"Solana's on-chain revenue and usage metrics are the strongest indicator of its price direction — unlike BTC which is macro-driven.",
+    },
+    {id:"C004",name:"Crypto + AI Stock Correlation",confidence:"HIGH",wins:0,losses:0,
+     triggers:["NVDA down 5%+ = avoid crypto buys","Chip earnings beat = crypto rallies too"],
+     action:"Check Nasdaq futures + NVDA BEFORE any crypto trade",
+     evidence:[{date:"Jun 24",text:"AI chip selloff → BTC -4.47%, ETH -5.4% in lockstep with Nasdaq",dot:"#E74C3C"},{date:"Jun 29",text:"Tech relief rally → crypto bounced same session",dot:"#2ECC71"}],
+     result:{pct:"71% corr",detail:"Confirmed multiple times · Institutional driven"},
+     why:"Institutional trading desks treat crypto as a risk-on asset alongside tech stocks. They buy and sell both together based on macro risk appetite.",
+    },
+    {id:"C005",name:"Bitcoin ETF Flow Signal",confidence:"MEDIUM",wins:0,losses:0,
+     triggers:["6+ straight days ETF outflows = bearish","First inflow day after streak = buy signal","Fear & Greed <30 = confirmation"],
+     action:"Watch IBIT/FBTC daily flows · Buy on first inflow after streak · Size small",
+     evidence:[{date:"May-Jun 2026",text:"10 straight days of outflows = $2.97B total → BTC fell 19% to $62,729",dot:"#E74C3C"}],
+     result:{pct:"Strong signal",detail:"Outflow streak predicted drop precisely"},
+     why:"$94B in BTC ETF AUM means institutional buying/selling of ETFs directly moves BTC price. When they redeem, BTC is sold. When they buy, BTC is purchased.",
+    },
+  ],
+};
 
+const CONF_COLORS={HIGH:"#2ECC71",MEDIUM:"#F39C12",LOW:"#E74C3C"};
+const CONF_WIDTH={HIGH:100,MEDIUM:60,LOW:25};
+const STOP=-0.35,TARGET=0.40;
 const pnlColor=(p)=>p===null?"#666":p>=TARGET*100?"#2ECC71":p<=STOP*100?"#E74C3C":p>0?"#58D68D":"#EC7063";
 const daysLeft=(d)=>Math.ceil((new Date(d)-new Date())/86400000);
+const TABS=["trades","patterns","journal","algorithms"];
+const TLABELS={trades:"📊 Trades",patterns:"🧠 Patterns",journal:"📓 Journal",algorithms:"⚗️ Algorithms"};
+const PLABELS={options:"🎯 Options",stocks:"📈 Stocks",crypto:"💎 Crypto"};
 
 function App(){
   const[tab,setTab]=useState("trades");
   const[prices,setPrices]=useState({});
   const[history,setHistory]=useState([]);
-  const[patterns,setPatterns]=useState([]);
   const[journal,setJournal]=useState([]);
   const[algorithms,setAlgorithms]=useState([]);
   const[loading,setLoading]=useState(false);
   const[lastUpdated,setLastUpdated]=useState(null);
   const[toast,setToast]=useState("");
-  const[newEntry,setNewEntry]=useState({stock:"AAPL",newsEvent:"",premiumMove:"",directionRight:"yes",lesson:"",patternType:"NEWS_DRIVEN"});
-  const[newAlgo,setNewAlgo]=useState({name:"",condition:"",action:"",confidence:"Low",stocks:""});
-  const[showJForm,setShowJForm]=useState(false);
-  const[showAForm,setShowAForm]=useState(false);
+  const[assetTab,setAssetTab]=useState("options");
+  const[selPattern,setSelPattern]=useState(null);
+  const[showJ,setShowJ]=useState(false);
+  const[showA,setShowA]=useState(false);
+  const[newJ,setNewJ]=useState({stock:"SMR",newsEvent:"",premiumMove:"",directionRight:"yes",lesson:""});
+  const[newA,setNewA]=useState({name:"",condition:"",action:"",confidence:"Medium",stocks:""});
 
   useEffect(()=>{loadAll();},[]);
-
-  const showToast=(m)=>{setToast(m);setTimeout(()=>setToast(""),2500)};
+  const showToast=(m)=>{setToast(m);setTimeout(()=>setToast(""),2500);};
 
   async function loadAll(){
-    try{
-      const r=await window.storage.get("ra-v2");
-      if(r?.value){const d=JSON.parse(r.value);setHistory(d.history||[]);setPatterns(d.patterns||[]);setJournal(d.journal||[]);setAlgorithms(d.algorithms||[]);}
-    }catch{}
+    try{const r=await window.storage.get("ra-v3");if(r?.value){const d=JSON.parse(r.value);setHistory(d.history||[]);setJournal(d.journal||[]);setAlgorithms(d.algorithms||[]);}}catch{}
   }
-
-  async function saveAll(h,p,j,a){
-    try{await window.storage.set("ra-v2",JSON.stringify({history:h,patterns:p,journal:j,algorithms:a}),false);showToast("✅ Saved privately");}
-    catch{showToast("⚠️ Save failed");}
+  async function saveAll(h,j,a){
+    try{await window.storage.set("ra-v3",JSON.stringify({history:h,journal:j,algorithms:a}),false);showToast("✅ Saved");}catch{showToast("⚠️ Save failed");}
   }
 
   const fetchPrices=useCallback(async()=>{
@@ -131,11 +292,10 @@ function App(){
     const liveIds=TRADES.filter(t=>t.instrumentId).map(t=>t.instrumentId);
     const idMap={};TRADES.filter(t=>t.instrumentId).forEach(t=>{idMap[t.instrumentId]=t.id;});
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",headers:{"Content-Type":"application/json"},
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,
-          system:`Trading assistant for ${OWNER}. Call get_option_quotes. Return ONLY JSON: {"instrument_id": mark_price}`,
-          messages:[{role:"user",content:`Get quotes JSON only: ${JSON.stringify(liveIds)}`}],
+          system:`Trading assistant for ${OWNER}. Call get_option_quotes. Return ONLY JSON mapping instrument_id to mark_price.`,
+          messages:[{role:"user",content:`Quotes JSON only: ${JSON.stringify(liveIds)}`}],
           mcp_servers:[{type:"url",url:"https://agent.robinhood.com/mcp/trading",name:"RoopeshRoobhinhood"}]})});
       const data=await res.json();
       const text=data.content.filter(b=>b.type==="text").map(b=>b.text).join("");
@@ -147,209 +307,255 @@ function App(){
         const today=new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
         const snap={date:today,ts:Date.now(),prices:{...np}};
         const nh=[...history.filter(h=>h.date!==today),snap];
-        const dp=detectPatterns(nh,journal);
-        setHistory(nh);setPatterns(dp);
-        await saveAll(nh,dp,journal,algorithms);
-        setLastUpdated(new Date().toLocaleTimeString());
-        showToast("🔄 Live prices updated");
+        setHistory(nh);await saveAll(nh,journal,algorithms);
+        setLastUpdated(new Date().toLocaleTimeString());showToast("🔄 Updated");
       }
-    }catch{showToast("⚠️ Fetch error");}
+    }catch{showToast("⚠️ Error");}
     setLoading(false);
   },[history,journal,algorithms]);
 
-  function detectPatterns(hist,jrnl){
-    const found=[];
-    jrnl.forEach(e=>{
-      if(e.directionRight==="yes"&&e.patternType==="NEWS_DRIVEN"){
-        const ex=found.find(f=>f.algo==="NEWS_DRIVEN"&&f.stock===e.stock);
-        if(ex){ex.count++;ex.confidence=ex.count>=2?"High":"Medium";}
-        else found.push({algo:"NEWS_DRIVEN",stock:e.stock,label:PATTERN_TYPES.NEWS_DRIVEN,detail:`News catalyst correct on ${e.stock}`,confidence:"Low",count:1,color:"#3498DB",date:e.date});
-      }
-      if(e.patternType==="POST_IPO"&&e.directionRight==="yes")
-        found.push({algo:"POST_IPO",stock:e.stock,label:PATTERN_TYPES.POST_IPO,detail:`Post-IPO fade put profitable on ${e.stock}`,confidence:"Medium",count:1,color:"#9B59B6",date:e.date});
-    });
-    TRADES.forEach(trade=>{
-      const pts=hist.map(h=>h.prices[trade.id]).filter(p=>p!==undefined);
-      if(pts.length>=3){
-        const l=pts.slice(-3);
-        if(l[2]>l[1]&&l[1]>l[0])found.push({algo:"TREND_UP",stock:trade.symbol,label:"📈 3-Day Uptrend",detail:`${trade.symbol} rising 3 days`,confidence:"Medium",count:1,color:"#2ECC71",date:new Date().toLocaleDateString()});
-        if(l[2]<l[1]&&l[1]<l[0])found.push({algo:"TREND_DOWN",stock:trade.symbol,label:"📉 3-Day Downtrend",detail:`${trade.symbol} falling — consider exit`,confidence:"High",count:1,color:"#E74C3C",date:new Date().toLocaleDateString()});
-      }
-      const cur=hist[hist.length-1]?.prices[trade.id];
-      if(cur){
-        const pct=((cur-trade.entry)/trade.entry)*100;
-        if(pct>=TARGET*100)found.push({algo:"TAKE_PROFIT",stock:trade.symbol,label:"🏆 Take Profit Hit",detail:`${trade.symbol} hit +40% → EXIT NOW`,confidence:"High",count:1,color:"#F1C40F",date:new Date().toLocaleDateString()});
-        if(pct<=STOP*100)found.push({algo:"STOP_LOSS",stock:trade.symbol,label:"🛑 Stop Loss Hit",detail:`${trade.symbol} hit −35% → EXIT NOW`,confidence:"High",count:1,color:"#E74C3C",date:new Date().toLocaleDateString()});
-      }
-    });
-    return found;
+  function getPct(t){
+    if(t.status==="closed")return t.closePnl||null;
+    const c=prices[t.id];return c?((c-t.entry)/t.entry)*100:null;
   }
 
-  function addJournalEntry(){
-    if(!newEntry.newsEvent||!newEntry.lesson){showToast("⚠️ Fill news event and lesson");return;}
-    const e={...newEntry,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),id:Date.now()};
-    const nj=[e,...journal];const np=detectPatterns(history,nj);
-    setJournal(nj);setPatterns(np);
-    setNewEntry({stock:"AAPL",newsEvent:"",premiumMove:"",directionRight:"yes",lesson:"",patternType:"NEWS_DRIVEN"});
-    setShowJForm(false);saveAll(history,np,nj,algorithms);
-  }
+  const wins=TRADES.filter(t=>t.closePnl>0).length;
+  const losses=TRADES.filter(t=>t.closePnl<0).length;
+  const openCount=TRADES.filter(t=>t.status==="open").length;
+  const allPatterns=[...PATTERNS.options,...PATTERNS.stocks,...PATTERNS.crypto];
+  const highConf=allPatterns.filter(p=>p.confidence==="HIGH").length;
 
-  function addAlgo(){
-    if(!newAlgo.name||!newAlgo.condition){showToast("⚠️ Fill name and condition");return;}
-    const a={...newAlgo,id:Date.now(),date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),owner:OWNER,verified:false};
-    const na=[a,...algorithms];setAlgorithms(na);
-    setNewAlgo({name:"",condition:"",action:"",confidence:"Low",stocks:""});
-    setShowAForm(false);saveAll(history,patterns,journal,na);
-  }
+  if(selPattern){
+    const p=selPattern;
+    const cc=CONF_COLORS[p.confidence];
+    return(
+      <div className="app">
+        <div className="header" style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={()=>setSelPattern(null)} style={{background:"#1A0A3E",border:"1px solid #4A2C8A",borderRadius:6,color:"#A78BFA",padding:"4px 10px",fontSize:12,cursor:"pointer"}}>← Back</button>
+          <div>
+            <div className="badge">🔒 Pattern Detail · {OWNER}</div>
+            <div style={{fontSize:16,fontWeight:700}}>{p.id} — {p.name}</div>
+          </div>
+        </div>
+        <div className="sec">
+          {/* Confidence */}
+          <div className="card" style={{padding:14,marginBottom:10,borderLeft:`3px solid ${cc}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+              <span style={{fontSize:13,fontWeight:700,color:cc}}>{p.confidence} CONFIDENCE</span>
+              <span className="verify-badge" style={{background:cc+"22",border:`1px solid ${cc}55`,color:cc}}>{p.confidence==="HIGH"?"✅ Verified":p.confidence==="MEDIUM"?"🟡 Developing":"🔴 Use Caution"}</span>
+            </div>
+            <div className="conf-bar-wrap">
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:"#555570"}}>
+                <span>Confidence Level</span><span>{CONF_WIDTH[p.confidence]}%</span>
+              </div>
+              <div className="conf-bar-bg"><div className="conf-bar-fill" style={{width:`${CONF_WIDTH[p.confidence]}%`,background:cc}}/></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:"#555570",marginTop:2}}>
+                <span>LOW</span><span>MEDIUM</span><span>HIGH</span>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:16,marginTop:10}}>
+              <div style={{textAlign:"center"}}><div style={{fontSize:20,fontWeight:700,color:"#2ECC71"}}>{p.wins}</div><div style={{fontSize:9,color:"#555570"}}>WINS</div></div>
+              <div style={{textAlign:"center"}}><div style={{fontSize:20,fontWeight:700,color:"#E74C3C"}}>{p.losses}</div><div style={{fontSize:9,color:"#555570"}}>LOSSES</div></div>
+              <div style={{flex:1,fontSize:11,color:"#888",paddingLeft:8,borderLeft:"1px solid #1E1A3E"}}>Win rate: {p.wins+p.losses>0?Math.round(p.wins/(p.wins+p.losses)*100):"N/A"}%</div>
+            </div>
+          </div>
 
-  function getPct(t){const c=prices[t.id];return c?((c-t.entry)/t.entry)*100:null;}
-  const gradReady=patterns.filter(p=>p.algo==="TAKE_PROFIT").length>=2;
+          {/* Why verified */}
+          {p.why&&<div className="card" style={{padding:14,marginBottom:10}}>
+            <div style={{fontSize:10,color:"#6B6B8A",textTransform:"uppercase",letterSpacing:".08em",marginBottom:6}}>🧠 Why This Pattern Works</div>
+            <div style={{fontSize:12,color:"#C8C8D8",lineHeight:1.7}}>{p.why}</div>
+          </div>}
+
+          {/* Triggers */}
+          <div className="card" style={{padding:14,marginBottom:10}}>
+            <div style={{fontSize:10,color:"#6B6B8A",textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>⚡ Entry Triggers (ALL must fire)</div>
+            {p.triggers.map((t,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0",borderBottom:i<p.triggers.length-1?"1px solid #1E1A3E":"none"}}>
+                <span style={{fontSize:14}}>🔲</span>
+                <span style={{fontSize:12,color:"#C8C8D8"}}>{t}</span>
+              </div>
+            ))}
+            <div style={{marginTop:10,padding:10,background:"#0A0A18",borderRadius:8,border:"1px solid #1E1A3E"}}>
+              <div style={{fontSize:9,color:"#6B6B8A",marginBottom:4}}>ACTION WHEN TRIGGERED</div>
+              <div style={{fontSize:12,color:"#A78BFA"}}>{p.action}</div>
+            </div>
+          </div>
+
+          {/* Evidence trail */}
+          <div className="card" style={{padding:14,marginBottom:10}}>
+            <div style={{fontSize:10,color:"#6B6B8A",textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>📋 Evidence Trail — How It Got Verified</div>
+            {p.evidence.map((e,i)=>(
+              <div key={i} className="ev-step">
+                <div className="ev-dot" style={{background:e.dot}}/>
+                <div style={{flex:1}}>
+                  <div className="ev-date">{e.date}</div>
+                  <div className="ev-text">{e.text}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Result */}
+          {p.result&&<div className="result-box">
+            <div><div className="result-pct" style={{color:p.result.pct.startsWith("-")?"#E74C3C":p.result.pct.startsWith("+")?"#2ECC71":"#A78BFA"}}>{p.result.pct}</div><div className="result-detail">{p.result.detail}</div></div>
+            <div style={{fontSize:28}}>{p.result.pct.startsWith("+")?"🏆":p.result.pct.includes("loss")||p.result.pct.startsWith("-")?"📚":"📊"}</div>
+          </div>}
+
+          {/* Next setup */}
+          {p.nextSetup&&<div style={{background:"#0A1A0A",border:"1px solid #153D15",borderRadius:10,padding:12,marginTop:10}}>
+            <div style={{fontSize:10,color:"#2ECC71",marginBottom:4,fontWeight:600}}>🎯 NEXT SETUP TO WATCH</div>
+            <div style={{fontSize:12,color:"#C8C8D8"}}>{p.nextSetup}</div>
+          </div>}
+        </div>
+        <div className="bottom">🔒 {OWNER} · Private Pattern Intelligence · {VERSION}</div>
+      </div>
+    );
+  }
 
   return(
     <div className="app">
       {toast&&<div className="toast">{toast}</div>}
-
       <div className="header">
-        <div className="owner-badge">🔒 Private · {OWNER} · {VERSION}</div>
+        <div className="badge">🔒 Private · {OWNER} · {VERSION}</div>
         <div className="title">⚗️ Trading Intelligence</div>
-        <div className="subtitle">Pattern algorithms · Live tracker · Private journal</div>
+        <div className="subtitle">Pattern algorithms · Live tracker · 17 proprietary patterns</div>
       </div>
-
       <div className="stats-bar">
-        {[{l:"Trades",v:TRADES.length},{l:"Patterns",v:patterns.length},{l:"Journal",v:journal.length},{l:"Algorithms",v:algorithms.length}].map((s,i)=>(
-          <div key={i} className="stat"><div className="stat-val">{s.v}</div><div className="stat-label">{s.l}</div></div>
+        {[{l:"Open",v:openCount},{l:"Wins",v:wins},{l:"Losses",v:losses},{l:"HIGH Patterns",v:highConf}].map((s,i)=>(
+          <div key={i} className="stat"><div className="stat-val" style={{color:i===1?"#2ECC71":i===2?"#E74C3C":"#A78BFA"}}>{s.v}</div><div className="stat-lbl">{s.l}</div></div>
         ))}
       </div>
-
       <div className="tab-bar">
-        {TABS.map(t=><button key={t} className={`tab${tab===t?" active":""}`} onClick={()=>setTab(t)}>{TAB_LABELS[t]}</button>)}
+        {TABS.map(t=><button key={t} className={`tab${tab===t?" on":""}`} onClick={()=>setTab(t)}>{TLABELS[t]}</button>)}
       </div>
 
       {tab==="trades"&&(
-        <div className="section">
+        <div className="sec">
           <button className="btn" onClick={fetchPrices} disabled={loading}>{loading?"⏳ Fetching...":"🔄 Refresh Live Prices"}</button>
           {lastUpdated&&<div style={{fontSize:10,color:"#555570",textAlign:"center",marginBottom:10}}>Updated {lastUpdated}</div>}
-          {TRADES.map(trade=>{
-            const cur=prices[trade.id];const pct=getPct(trade);const days=daysLeft(trade.expiryDate);
+          {/* Open trades */}
+          <div style={{fontSize:10,color:"#555570",marginBottom:6,letterSpacing:".08em",textTransform:"uppercase"}}>Open Positions</div>
+          {TRADES.filter(t=>t.status==="open").map(trade=>{
+            const pct=getPct(trade);const days=daysLeft(trade.expiryDate);const urgent=days<=3;
             return(
               <div key={trade.id} className="card" style={{borderLeft:`3px solid ${trade.color}`}}>
-                <div className="trade-header">
+                <div className="th">
                   <div>
                     <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:3}}>
-                      <span>{trade.emoji}</span>
-                      <span className="trade-name">{trade.symbol}</span>
-                      <span className="pill" style={{background:trade.color+"22",color:trade.color,border:`1px solid ${trade.color}44`}}>{trade.contract}</span>
-                      {trade.type==="real"&&<span className="pill" style={{background:"#F39C1222",color:"#F39C12",border:"1px solid #F39C1244"}}>💰 REAL</span>}
+                      <span>{trade.emoji}</span><span style={{fontSize:15,fontWeight:700}}>{trade.symbol}</span>
+                      <span className="pill" style={{background:trade.color+"22",color:trade.color,borderColor:trade.color+"44"}}>{trade.contract}</span>
                     </div>
-                    <div className="trade-sub">
-                      {trade.direction==="call"?"🟢 Bull":"🔴 Bear"} · {trade.sector} · {trade.expiry}
-                      {days<=3&&<span style={{color:"#E74C3C",fontWeight:700}}> · ⚠️ {days}d!</span>}
-                    </div>
+                    <div className="tsub">{trade.direction==="call"?"🟢 Bull":"🔴 Bear"} · {trade.sector} · {trade.expiry}{urgent&&<span style={{color:"#E74C3C",fontWeight:700}}> · ⚠️ {days}d!</span>}</div>
                   </div>
                   <div style={{fontSize:16,fontWeight:700,color:pnlColor(pct)}}>{pct!==null?`${pct>=0?"+":""}${pct.toFixed(1)}%`:"—"}</div>
                 </div>
-                <div className="grid4">
-                  {[{l:"Entry",v:`$${trade.entry.toFixed(2)}`},{l:"Now",v:cur?`$${cur.toFixed(2)}`:"—"},{l:"Stop",v:`$${(trade.entry*(1+STOP)).toFixed(2)}`,c:"#E74C3C"},{l:"Target",v:`$${(trade.entry*(1+TARGET)).toFixed(2)}`,c:"#2ECC71"}].map((c,i)=>(
-                    <div key={i} className="cell"><div className="cell-val" style={{color:c.c||"#E8E8F0"}}>{c.v}</div><div className="cell-label">{c.l}</div></div>
+                <div className="g4">
+                  {[{l:"Entry",v:`$${trade.entry.toFixed(2)}`},{l:"Now",v:prices[trade.id]?`$${prices[trade.id].toFixed(2)}`:"—"},{l:"Stop",v:`$${(trade.entry*(1+STOP)).toFixed(2)}`,c:"#E74C3C"},{l:"Target",v:`$${(trade.entry*(1+TARGET)).toFixed(2)}`,c:"#2ECC71"}].map((c,i)=>(
+                    <div key={i} className="cell"><div className="cv" style={{color:c.c||"#E8E8F0"}}>{c.v}</div><div className="cl">{c.l}</div></div>
                   ))}
                 </div>
-                <div className="exit-row">
-                  <div className="exit-box stop-box"><div className="exit-label" style={{color:"#E74C3C"}}>🛑 STOP (−35%)</div><div className="exit-val" style={{color:"#E74C3C"}}>${(trade.entry*(1+STOP)).toFixed(2)}</div></div>
-                  <div className="exit-box target-box"><div className="exit-label" style={{color:"#2ECC71"}}>✅ TARGET (+40%)</div><div className="exit-val" style={{color:"#2ECC71"}}>${(trade.entry*(1+TARGET)).toFixed(2)}</div></div>
-                </div>
-                {pct!==null&&(
-                  <div className="progress-wrap">
-                    <div className="progress-bar"><div className="progress-fill" style={{width:`${Math.min(100,Math.max(0,((pct+35)/75)*100))}%`,background:pct>=0?"#2ECC71":"#E74C3C"}}/></div>
-                    <div className="progress-labels"><span style={{color:"#E74C3C"}}>−35%</span><span>0%</span><span style={{color:"#2ECC71"}}>+40%</span></div>
-                  </div>
-                )}
+                {pct!==null&&<div className="prog-wrap"><div className="prog-bar"><div className="prog-fill" style={{width:`${Math.min(100,Math.max(0,((pct+35)/75)*100))}%`,background:pct>=0?"#2ECC71":"#E74C3C"}}/></div><div className="prog-lbls"><span style={{color:"#E74C3C"}}>−35%</span><span>0%</span><span style={{color:"#2ECC71"}}>+40%</span></div></div>}
               </div>
             );
           })}
-          {gradReady&&<div style={{background:"#0A2010",border:"1px solid #1A5030",borderRadius:10,padding:14,textAlign:"center"}}><div style={{fontSize:20,marginBottom:4}}>🎓</div><div style={{fontSize:13,fontWeight:700,color:"#2ECC71"}}>Ready for Real Money!</div></div>}
-        </div>
-      )}
-
-      {tab==="history"&&(
-        <div className="section">
-          {history.length===0?<div className="empty"><div className="empty-icon">📅</div><div>No history yet</div><div style={{fontSize:11,marginTop:4}}>Refresh prices to start tracking</div></div>
-          :[...history].reverse().map((snap,i)=>(
-            <div key={i} className="history-card">
-              <div style={{fontSize:11,fontWeight:600,color:"#A78BFA"}}>📅 {snap.date}</div>
-              <div className="history-grid">
-                {TRADES.map(trade=>{
-                  const p=snap.prices[trade.id];const pct=p?((p-trade.entry)/trade.entry)*100:null;
-                  return(<div key={trade.id} className="history-cell"><div style={{fontSize:10,color:"#555570"}}>{trade.emoji} {trade.symbol}</div><div style={{fontSize:12,fontWeight:600,color:pnlColor(pct),marginTop:2}}>{pct!==null?`${pct>=0?"+":""}${pct.toFixed(1)}%`:"—"}</div></div>);
-                })}
+          {/* Closed trades */}
+          <div style={{fontSize:10,color:"#555570",margin:"12px 0 6px",letterSpacing:".08em",textTransform:"uppercase"}}>Closed Positions</div>
+          {TRADES.filter(t=>t.status==="closed").map(trade=>{
+            const pct=trade.closePnl;
+            return(
+              <div key={trade.id} style={{background:"#0D0B1E",border:`1px solid ${pct>0?"#2ECC7133":"#E74C3C33"}`,borderLeft:`3px solid ${pct>0?"#2ECC71":"#E74C3C"}`,borderRadius:10,padding:10,marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:5}}>
+                    <span>{trade.emoji}</span><span style={{fontSize:13,fontWeight:600}}>{trade.symbol}</span>
+                    <span style={{fontSize:10,color:"#555570"}}>{trade.contract}</span>
+                  </div>
+                  <div style={{fontSize:10,color:"#555570",marginTop:2}}>{trade.sector} · Entry ${trade.entry.toFixed(2)}</div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={{fontSize:16,fontWeight:700,color:pct>0?"#2ECC71":"#E74C3C"}}>{pct>0?"+":""}{pct?.toFixed(1)}%</div>
+                  <div style={{fontSize:10,color:"#555570"}}>{pct>0?"✅ WIN":"❌ LOSS"}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {tab==="patterns"&&(
-        <div className="section">
-          <div className="card" style={{padding:14,marginBottom:12,borderColor:"#2D1B69"}}>
-            <div style={{fontSize:12,fontWeight:600,color:"#A78BFA",marginBottom:10}}>🎓 Graduation Checklist</div>
-            {[{l:"2 paper trades hit +40%",done:patterns.filter(p=>p.algo==="TAKE_PROFIT").length>=2},{l:"3+ days of price history",done:history.length>=3},{l:"5+ journal entries",done:journal.length>=5},{l:"2+ algorithms verified",done:algorithms.filter(a=>a.verified).length>=2},{l:"No stop losses hit",done:!patterns.some(p=>p.algo==="STOP_LOSS")}].map((c,i)=>(
-              <div key={i} className="grad-item"><span>{c.done?"✅":"⬜"}</span><span style={{fontSize:11,color:c.done?"#2ECC71":"#555570"}}>{c.l}</span></div>
-            ))}
+        <div className="sec">
+          <div style={{fontSize:11,color:"#555570",marginBottom:10,textAlign:"center"}}>Tap any pattern to see full verification evidence</div>
+          <div className="asset-tabs">
+            {["options","stocks","crypto"].map(a=><button key={a} className={`asset-tab${assetTab===a?" on":""}`} onClick={()=>setAssetTab(a)}>{PLABELS[a]}</button>)}
           </div>
-          {patterns.length===0?<div className="empty"><div className="empty-icon">🧠</div><div>Patterns emerge after 3+ days + journal entries</div></div>
-          :patterns.map((p,i)=>(
-            <div key={i} style={{background:"#0D0B1E",border:`1px solid #1E1A3E`,borderLeft:`3px solid ${p.color}`,borderRadius:10,padding:12,marginBottom:8}}>
-              <div style={{display:"flex",justifyContent:"space-between"}}>
-                <span style={{fontSize:12,fontWeight:600,color:p.color}}>{p.label}</span>
-                <span className="pill" style={{background:(p.confidence==="High"?"#2ECC71":p.confidence==="Medium"?"#F39C12":"#666")+"22",color:p.confidence==="High"?"#2ECC71":p.confidence==="Medium"?"#F39C12":"#666",border:"1px solid #33333344"}}>{p.confidence}</span>
+          {PATTERNS[assetTab].map(p=>{
+            const cc=CONF_COLORS[p.confidence];
+            return(
+              <div key={p.id} className="card" style={{borderLeft:`3px solid ${cc}`,cursor:"pointer"}} onClick={()=>setSelPattern(p)}>
+                <div style={{padding:"12px 13px"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+                    <div>
+                      <span style={{fontSize:10,color:"#555570"}}>{p.id} · </span>
+                      <span style={{fontSize:13,fontWeight:600,color:cc}}>{p.name}</span>
+                    </div>
+                    <span className="verify-badge" style={{background:cc+"22",border:`1px solid ${cc}55`,color:cc,flexShrink:0}}>
+                      {p.confidence==="HIGH"?"✅ Verified":p.confidence==="MEDIUM"?"🟡 Developing":"🔴 Caution"}
+                    </span>
+                  </div>
+                  <div className="conf-bar-bg" style={{marginBottom:6}}><div className="conf-bar-fill" style={{width:`${CONF_WIDTH[p.confidence]}%`,background:cc}}/></div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div style={{fontSize:11,color:"#888"}}>{p.result?.pct} · {p.result?.detail?.split("·")[0]}</div>
+                    <div style={{fontSize:11,color:"#555570"}}>Tap to explore →</div>
+                  </div>
+                </div>
               </div>
-              <div style={{fontSize:10,color:"#555570",marginTop:3}}>{p.stock} · {p.detail}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {tab==="journal"&&(
-        <div className="section">
+        <div className="sec">
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <div style={{fontSize:11,color:"#555570"}}>{journal.length} entries · Private</div>
-            <button className="btn-small" onClick={()=>setShowJForm(!showJForm)}>{showJForm?"✕ Cancel":"+ Log Entry"}</button>
+            <div style={{fontSize:11,color:"#555570"}}>{journal.length} entries · Private to {OWNER}</div>
+            <button className="sm-btn" onClick={()=>setShowJ(!showJ)}>{showJ?"✕":"+ Log"}</button>
           </div>
-          {showJForm&&(
-            <div className="journal-form">
-              <div className="form-title">📓 New Entry</div>
-              <label className="form-label">Stock</label>
-              <select className="form-select" value={newEntry.stock} onChange={e=>setNewEntry({...newEntry,stock:e.target.value})}>
-                {TRADES.map(t=><option key={t.id} value={t.symbol}>{t.emoji} {t.symbol}</option>)}
+          {showJ&&(
+            <div className="card" style={{padding:14,marginBottom:12,border:"1px solid #4A2C8A"}}>
+              <div style={{fontSize:12,fontWeight:600,color:"#A78BFA",marginBottom:10}}>📓 New Entry</div>
+              <label>Stock / Symbol</label>
+              <select value={newJ.stock} onChange={e=>setNewJ({...newJ,stock:e.target.value})}>
+                {["SMR","SPCX","TSLA","GLD","SQQQ","HOOD","NIO","BTC","ETH","SOL"].map(s=><option key={s}>{s}</option>)}
               </select>
-              <label className="form-label">Pattern Type</label>
-              <select className="form-select" value={newEntry.patternType} onChange={e=>setNewEntry({...newEntry,patternType:e.target.value})}>
-                {Object.entries(PATTERN_TYPES).map(([k,v])=><option key={k} value={k}>{v}</option>)}
-              </select>
-              <label className="form-label">News Event</label>
-              <input className="form-input" value={newEntry.newsEvent} onChange={e=>setNewEntry({...newEntry,newsEvent:e.target.value})} placeholder="e.g. Record Q1 profit + dividend"/>
-              <label className="form-label">Premium Move</label>
-              <input className="form-input" value={newEntry.premiumMove} onChange={e=>setNewEntry({...newEntry,premiumMove:e.target.value})} placeholder="e.g. +29% in one day"/>
-              <label className="form-label">Direction Correct?</label>
-              <select className="form-select" value={newEntry.directionRight} onChange={e=>setNewEntry({...newEntry,directionRight:e.target.value})}>
+              <label>News Event</label>
+              <input value={newJ.newsEvent} onChange={e=>setNewJ({...newJ,newsEvent:e.target.value})} placeholder="What news drove the move?"/>
+              <label>Premium / Price Move</label>
+              <input value={newJ.premiumMove} onChange={e=>setNewJ({...newJ,premiumMove:e.target.value})} placeholder="e.g. +29% in one day"/>
+              <label>Direction Correct?</label>
+              <select value={newJ.directionRight} onChange={e=>setNewJ({...newJ,directionRight:e.target.value})}>
                 <option value="yes">✅ Yes</option><option value="no">❌ No</option><option value="partial">⚠️ Partial</option>
               </select>
-              <label className="form-label">Lesson Learned</label>
-              <input className="form-input" value={newEntry.lesson} onChange={e=>setNewEntry({...newEntry,lesson:e.target.value})} placeholder="e.g. Fundamentals beat macro short-term"/>
-              <button className="btn-green" onClick={addJournalEntry}>💾 Save Entry</button>
+              <label>Lesson Learned</label>
+              <input value={newJ.lesson} onChange={e=>setNewJ({...newJ,lesson:e.target.value})} placeholder="What pattern does this confirm or refute?"/>
+              <button className="green-btn" onClick={()=>{
+                if(!newJ.newsEvent||!newJ.lesson){showToast("⚠️ Fill in news and lesson");return;}
+                const e={...newJ,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),id:Date.now()};
+                const nj=[e,...journal];setJournal(nj);setShowJ(false);
+                setNewJ({stock:"SMR",newsEvent:"",premiumMove:"",directionRight:"yes",lesson:""});
+                saveAll(history,nj,algorithms);
+              }}>💾 Save Entry</button>
             </div>
           )}
-          {journal.length===0?<div className="empty"><div className="empty-icon">📓</div><div>No entries yet</div></div>
+          {journal.length===0?<div className="empty"><div className="fi">📓</div><div>No journal entries yet</div><div style={{fontSize:11,marginTop:4}}>Tap + Log to add your first entry</div></div>
           :journal.map((e,i)=>(
             <div key={i} style={{background:"#0D0B1E",border:"1px solid #1E1A3E",borderLeft:`3px solid ${e.directionRight==="yes"?"#2ECC71":e.directionRight==="no"?"#E74C3C":"#F39C12"}`,borderRadius:10,padding:12,marginBottom:8}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
-                <span style={{fontSize:11,fontWeight:600}}>{TRADES.find(t=>t.symbol===e.stock)?.emoji} {e.stock}</span>
+                <span style={{fontSize:12,fontWeight:600}}>{e.stock}</span>
                 <span style={{fontSize:10,color:"#555570"}}>{e.date}</span>
               </div>
-              <div style={{fontSize:10,color:"#A78BFA",marginBottom:3}}>{PATTERN_TYPES[e.patternType]}</div>
               <div style={{fontSize:11,color:"#888",marginBottom:3}}>📰 {e.newsEvent}</div>
               {e.premiumMove&&<div style={{fontSize:11,color:"#888",marginBottom:3}}>📈 {e.premiumMove}</div>}
-              <div style={{fontSize:11,color:"#E8E8F0",fontStyle:"italic",marginBottom:5}}>💡 {e.lesson}</div>
-              <span className="pill" style={{background:(e.directionRight==="yes"?"#2ECC71":e.directionRight==="no"?"#E74C3C":"#F39C12")+"22",color:e.directionRight==="yes"?"#2ECC71":e.directionRight==="no"?"#E74C3C":"#F39C12",border:"1px solid #33333344"}}>
+              <div style={{fontSize:11,color:"#C8C8D8",fontStyle:"italic",marginBottom:5}}>💡 {e.lesson}</div>
+              <span className="pill" style={{background:(e.directionRight==="yes"?"#2ECC71":e.directionRight==="no"?"#E74C3C":"#F39C12")+"22",color:e.directionRight==="yes"?"#2ECC71":e.directionRight==="no"?"#E74C3C":"#F39C12",borderColor:"transparent"}}>
                 {e.directionRight==="yes"?"✅ Right":e.directionRight==="no"?"❌ Wrong":"⚠️ Partial"}
               </span>
             </div>
@@ -358,63 +564,72 @@ function App(){
       )}
 
       {tab==="algorithms"&&(
-        <div className="section">
-          <div className="ip-box">
-            <div style={{fontSize:10,color:"#A78BFA",marginBottom:3,letterSpacing:".08em",textTransform:"uppercase"}}>Intellectual Property</div>
+        <div className="sec">
+          <div style={{background:"#0A0520",border:"1px solid #2D1B69",borderRadius:10,padding:12,marginBottom:12}}>
+            <div style={{fontSize:10,color:"#A78BFA",letterSpacing:".08em",textTransform:"uppercase",marginBottom:3}}>Intellectual Property</div>
             <div style={{fontSize:13,fontWeight:700}}>© {OWNER}</div>
-            <div style={{fontSize:10,color:"#555570",marginTop:2}}>All trading pattern algorithms are private IP of {OWNER}. Not for public use.</div>
+            <div style={{fontSize:10,color:"#555570",marginTop:2}}>17 proprietary trading algorithms · Private · Not for public use or distribution</div>
           </div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <div style={{fontSize:11,color:"#555570"}}>{algorithms.length} custom algorithms</div>
-            <button className="btn-small" onClick={()=>setShowAForm(!showAForm)}>{showAForm?"✕ Cancel":"+ New Algorithm"}</button>
+            <div style={{fontSize:11,color:"#555570"}}>{algorithms.length} custom + {allPatterns.length} system algorithms</div>
+            <button className="sm-btn" onClick={()=>setShowA(!showA)}>{showA?"✕":"+ New"}</button>
           </div>
-          {showAForm&&(
-            <div className="journal-form">
-              <div className="form-title">⚗️ Define Algorithm</div>
-              <label className="form-label">Algorithm Name</label>
-              <input className="form-input" value={newAlgo.name} onChange={e=>setNewAlgo({...newAlgo,name:e.target.value})} placeholder="e.g. Dividend Support Bull Call"/>
-              <label className="form-label">Condition (When to trigger)</label>
-              <input className="form-input" value={newAlgo.condition} onChange={e=>setNewAlgo({...newAlgo,condition:e.target.value})} placeholder="e.g. Company announces dividend + record profits"/>
-              <label className="form-label">Action (What to do)</label>
-              <input className="form-input" value={newAlgo.action} onChange={e=>setNewAlgo({...newAlgo,action:e.target.value})} placeholder="e.g. Buy ATM Call, 3-4 weeks expiry"/>
-              <label className="form-label">Applicable Stocks</label>
-              <input className="form-input" value={newAlgo.stocks} onChange={e=>setNewAlgo({...newAlgo,stocks:e.target.value})} placeholder="e.g. FRO, any dividend stock"/>
-              <label className="form-label">Confidence</label>
-              <select className="form-select" value={newAlgo.confidence} onChange={e=>setNewAlgo({...newAlgo,confidence:e.target.value})}>
-                <option value="Low">Low — needs more data</option>
-                <option value="Medium">Medium — seen 2-3 times</option>
-                <option value="High">High — proven pattern</option>
+          {showA&&(
+            <div className="card" style={{padding:14,marginBottom:12,border:"1px solid #4A2C8A"}}>
+              <div style={{fontSize:12,fontWeight:600,color:"#A78BFA",marginBottom:10}}>⚗️ Define Algorithm</div>
+              <label>Name</label><input value={newA.name} onChange={e=>setNewA({...newA,name:e.target.value})} placeholder="e.g. Dividend Support Bull Call"/>
+              <label>Trigger Condition</label><input value={newA.condition} onChange={e=>setNewA({...newA,condition:e.target.value})} placeholder="When does this pattern fire?"/>
+              <label>Action</label><input value={newA.action} onChange={e=>setNewA({...newA,action:e.target.value})} placeholder="What do you do when triggered?"/>
+              <label>Applicable Stocks</label><input value={newA.stocks} onChange={e=>setNewA({...newA,stocks:e.target.value})} placeholder="e.g. FRO, any dividend stock"/>
+              <label>Confidence</label>
+              <select value={newA.confidence} onChange={e=>setNewA({...newA,confidence:e.target.value})}>
+                <option value="High">High — proven pattern</option><option value="Medium">Medium — developing</option><option value="Low">Low — needs data</option>
               </select>
-              <button className="btn" onClick={addAlgo}>⚗️ Save Algorithm</button>
+              <button className="btn" onClick={()=>{
+                if(!newA.name||!newA.condition){showToast("⚠️ Fill name and condition");return;}
+                const a={...newA,id:Date.now(),date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),owner:OWNER,verified:false};
+                const na=[a,...algorithms];setAlgorithms(na);setShowA(false);
+                setNewA({name:"",condition:"",action:"",confidence:"Medium",stocks:""});
+                saveAll(history,journal,na);
+              }}>⚗️ Save Algorithm</button>
             </div>
           )}
-          {algorithms.length===0?<div className="empty"><div className="empty-icon">⚗️</div><div>No algorithms yet</div><div style={{fontSize:11,marginTop:4}}>Add journal entries or define one above</div></div>
-          :algorithms.map((a,i)=>(
-            <div key={i} className="algo-card">
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
-                <span style={{fontSize:12,fontWeight:700,color:"#A78BFA"}}>⚗️ {a.name}</span>
-                <span className="pill" style={{background:(a.confidence==="High"?"#2ECC71":a.confidence==="Medium"?"#F39C12":"#666")+"22",color:a.confidence==="High"?"#2ECC71":a.confidence==="Medium"?"#F39C12":"#666",border:"1px solid #33333344"}}>{a.confidence}</span>
+          {/* System patterns summary */}
+          <div style={{fontSize:10,color:"#555570",marginBottom:6,letterSpacing:".08em",textTransform:"uppercase"}}>System Patterns (tap Patterns tab for details)</div>
+          {allPatterns.map((p,i)=>{
+            const cc=CONF_COLORS[p.confidence];
+            return(
+              <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid #1E1A3E"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{width:6,height:6,borderRadius:"50%",background:cc,flexShrink:0}}/>
+                  <span style={{fontSize:12,color:"#C8C8D8"}}>{p.id} · {p.name}</span>
+                </div>
+                <span className="pill" style={{background:cc+"22",color:cc,borderColor:cc+"44",fontSize:9}}>{p.confidence}</span>
               </div>
-              <div style={{fontSize:10,color:"#888",marginBottom:3}}><span style={{color:"#555570"}}>WHEN: </span>{a.condition}</div>
-              <div style={{fontSize:10,color:"#888",marginBottom:3}}><span style={{color:"#555570"}}>DO: </span>{a.action}</div>
-              {a.stocks&&<div style={{fontSize:10,color:"#888",marginBottom:4}}><span style={{color:"#555570"}}>STOCKS: </span>{a.stocks}</div>}
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <span style={{fontSize:9,color:"#444460"}}>{a.date}</span>
-                <button className={`verify-btn${a.verified?" verified":""}`} onClick={()=>{
-                  const ua=algorithms.map((x,j)=>j===i?{...x,verified:!x.verified}:x);
-                  setAlgorithms(ua);saveAll(history,patterns,journal,ua);
-                }}>{a.verified?"✅ Verified":"⬜ Mark Verified"}</button>
+            );
+          })}
+          {/* Custom algorithms */}
+          {algorithms.length>0&&<>
+            <div style={{fontSize:10,color:"#555570",margin:"12px 0 6px",letterSpacing:".08em",textTransform:"uppercase"}}>Your Custom Algorithms</div>
+            {algorithms.map((a,i)=>(
+              <div key={i} style={{background:"#0D0B1E",border:"1px solid #1E1A3E",borderLeft:"3px solid #7C3AED",borderRadius:10,padding:12,marginBottom:8}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                  <span style={{fontSize:12,fontWeight:700,color:"#A78BFA"}}>⚗️ {a.name}</span>
+                  <span className="pill" style={{background:"#A78BFA22",color:"#A78BFA",borderColor:"#A78BFA44",fontSize:9}}>{a.confidence}</span>
+                </div>
+                <div style={{fontSize:10,color:"#888"}}><span style={{color:"#555570"}}>WHEN: </span>{a.condition}</div>
+                {a.action&&<div style={{fontSize:10,color:"#888",marginTop:2}}><span style={{color:"#555570"}}>DO: </span>{a.action}</div>}
+                <div style={{fontSize:9,color:"#444460",marginTop:4}}>{a.date} · {OWNER}</div>
               </div>
-            </div>
-          ))}
+            ))}
+          </>}
         </div>
       )}
-
-      <div className="bottom-bar">🔒 Private · {OWNER} · Data stored locally · Not shared</div>
+      <div className="bottom">🔒 Private · {OWNER} · All data stored locally · Not shared</div>
     </div>
   );
 }
-ReactDOM.render(<App/>, document.getElementById("root"));
+ReactDOM.render(<App/>,document.getElementById("root"));
 </script>
 </body>
 </html>
